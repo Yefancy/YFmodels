@@ -1,0 +1,14 @@
+F:\C#example\YFmodels\Console\bin\Debug\netcoreapp2.1\ConsoleApp.deps.json
+F:\C#example\YFmodels\Console\bin\Debug\netcoreapp2.1\ConsoleApp.runtimeconfig.json
+F:\C#example\YFmodels\Console\bin\Debug\netcoreapp2.1\ConsoleApp.runtimeconfig.dev.json
+F:\C#example\YFmodels\Console\bin\Debug\netcoreapp2.1\ConsoleApp.dll
+F:\C#example\YFmodels\Console\bin\Debug\netcoreapp2.1\ConsoleApp.pdb
+F:\C#example\YFmodels\Console\bin\Debug\netcoreapp2.1\YFmodels.dll
+F:\C#example\YFmodels\Console\bin\Debug\netcoreapp2.1\YFmodels.pdb
+F:\C#example\YFmodels\Console\obj\Debug\netcoreapp2.1\ConsoleApp.csprojAssemblyReference.cache
+F:\C#example\YFmodels\Console\obj\Debug\netcoreapp2.1\ConsoleApp.csproj.CoreCompileInputs.cache
+F:\C#example\YFmodels\Console\obj\Debug\netcoreapp2.1\ConsoleApp.AssemblyInfoInputs.cache
+F:\C#example\YFmodels\Console\obj\Debug\netcoreapp2.1\ConsoleApp.AssemblyInfo.cs
+F:\C#example\YFmodels\Console\obj\Debug\netcoreapp2.1\ConsoleApp.csproj.CopyComplete
+F:\C#example\YFmodels\Console\obj\Debug\netcoreapp2.1\ConsoleApp.dll
+F:\C#example\YFmodels\Console\obj\Debug\netcoreapp2.1\ConsoleApp.pdb

@@ -1,0 +1,9 @@
+F:\C#example\YFmodels\YFmodels\bin\Debug\netstandard2.0\YFmodels.deps.json
+F:\C#example\YFmodels\YFmodels\bin\Debug\netstandard2.0\YFmodels.dll
+F:\C#example\YFmodels\YFmodels\bin\Debug\netstandard2.0\YFmodels.pdb
+F:\C#example\YFmodels\YFmodels\obj\Debug\netstandard2.0\YFmodels.csprojAssemblyReference.cache
+F:\C#example\YFmodels\YFmodels\obj\Debug\netstandard2.0\YFmodels.csproj.CoreCompileInputs.cache
+F:\C#example\YFmodels\YFmodels\obj\Debug\netstandard2.0\YFmodels.AssemblyInfoInputs.cache
+F:\C#example\YFmodels\YFmodels\obj\Debug\netstandard2.0\YFmodels.AssemblyInfo.cs
+F:\C#example\YFmodels\YFmodels\obj\Debug\netstandard2.0\YFmodels.dll
+F:\C#example\YFmodels\YFmodels\obj\Debug\netstandard2.0\YFmodels.pdb
