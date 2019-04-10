@@ -1,50 +1,55 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace YFmodels
 {
-    public class Model:ICloneable
+    public class Model : ICloneable
     {
-        public List<Atom> facts;
-        public List<Rule> rules;
+        public List<Atom> atoms;
 
         public Model()
         {
-            facts = new List<Atom>();
-            rules = new List<Rule>();
+            atoms = new List<Atom>();
         }
 
-        public override string ToString()
+        public bool IsConflict()
         {
-            string result = "\n";
-            foreach(var f in facts)
-            {
-                result += f.ToString() + "\n";
-            }
-            foreach (var r in rules)
-            {
-                result += r.ToString() + "\n";
-            }
-            return result;
-        }
-
-        public void AddRule(Rule rule)
-        {
-            rules.Add(rule);
-        }
-
-        public void AddFact(Atom fact)
-        {
-            facts.Add(fact);
+            foreach (var a in atoms)
+                if (a.trueFlag && a.falseFlag) return true;
+            return false;
         }
 
         public object Clone()
         {
-            Model clone = new Model();
-            clone.facts = Utils.ListClone(facts);
-            clone.rules = Utils.ListClone(rules);
-            return clone;
+            Model m = new Model();
+            foreach (Atom a in atoms)
+                m.atoms.Add(a);
+            return m;
+        }
+
+        public static bool operator==(Model a, Model b)
+        {
+            if (a.atoms.Count != b.atoms.Count) return false;
+            foreach(var atoma in a.atoms)
+            {
+                bool find = false;
+                foreach(var atomb in b.atoms)
+                    if(atomb.atom == atoma.atom)
+                    {
+                        find = true;
+                        break;
+                    }
+                if (!find)
+                    return false;
+            }
+            return true;
+        }
+
+        public static bool operator !=(Model a, Model b)
+        {
+            return !(a == b);
         }
     }
 }

@@ -1,67 +1,77 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace YFmodels
 {
     public class YFmodeler
     {
-        private Model basicModel;
-        public List<Atom> stable_model;
-        public Dictionary<string, int> ValueTable;//0-false 1-true 2-unknown
+        private YFProgram program;
 
-        public YFmodeler(Model model) { basicModel = model; ValueTable = new Dictionary<string, int>(); }
-
-        public void run(int expect)
+        public YFmodeler(YFProgram p)
         {
-            stable_model = meaning(basicModel);
+            program = p;
         }
 
-
-        private List<Atom> meaning(Model basicModel)
+        public void RunModels()
         {
-            List<Atom> m_model = new List<Atom>();
-            foreach (Atom item in basicModel.facts)
+
+        }
+
+        private bool DFSModels(YFProgram program, Model partialModel)
+        {
+            partialModel = Expand(program, partialModel);
+            if (partialModel.IsConflict()) return false;
+            else if (partialModel.atoms.Count == program.AtomCount)
             {
-                m_model.Add(item);
+                if (CheckReduct(program, partialModel))
+                    return true;
+                return false;
             }
-            while (true)
+            else
             {
-                bool flag = true;
-                foreach(var rule in basicModel.rules)
+                int literal = heuristic(program, partialModel);
+                Atom atom = new Atom();
+                atom.atom = literal; atom.falseFlag = false; atom.trueFlag = true;
+                Model TM = (Model)partialModel.Clone();
+                TM.atoms.Add(atom);
+                if (DFSModels(program, TM)) return true;
+                else
                 {
-                    if (rule.haveNot) continue;
-                    bool bodytrue = true;
-                    foreach(var body in rule.body)
-                    {
-                        if (m_model.Exists(a => { return a == body; })) continue;
-                        bodytrue = false;
-                        break;
-                    }
-                    if (bodytrue)
-                    {
-                        foreach(var head in rule.head)
-                        {
-                            if (m_model.Exists(a => { return a == head; })) continue;
-                            m_model.Add(head);
-                            flag = false;
-                        }
-                    }
+                    atom.atom = literal; atom.falseFlag = true; atom.trueFlag = false;
+                    Model FM = (Model)partialModel.Clone();
+                    FM.atoms.Add(atom);
+                    return DFSModels(program, FM);
                 }
-                if (flag) break;
             }
-            return m_model;
         }
 
-        public string PrintModel()
+        private Model Expand(YFProgram program, Model partialModel)
         {
-            string result = "stable model:";
-            if (stable_model == null) return "have not run model";
-            foreach (var item in stable_model)
+            do
             {
-                result += item.ToString() + " ";
-            }
-            return result;
+                Model copy = (Model)partialModel.Clone();
+                partialModel = Atleast(program, partialModel);
+            } while (true);
+            throw new Exception();
+        }
+
+        private bool Conflict(Model partialModel)
+        {
+
+            return false;
+        }
+
+        private bool CheckReduct(YFProgram program, Model partialModel)
+        {
+            return true;
+        }
+
+        private int heuristic(YFProgram program, Model partialModel)
+        {
+
+            return -1;
         }
     }
 }
