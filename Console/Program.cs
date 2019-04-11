@@ -81,6 +81,30 @@ namespace ConsoleApp
             program.rules.Add(rule4);
             program.rules.Add(rule5);
 
+            Atom a = new Atom(7);
+            Atom b = new Atom(8);
+
+            program.atoms.Add(a);
+            program.atoms.Add(b);
+
+            //fact
+
+            //rule
+            Rule rule6 = new Rule();
+            rule6.head = a;
+            a.hList.Add(rule6);
+            rule6.nBody.Add(b);
+            b.nList.Add(rule6);
+
+            Rule rule7 = new Rule();
+            rule7.head = b;
+            b.hList.Add(rule7);
+            rule7.nBody.Add(a);
+            a.nList.Add(rule7);
+
+            program.rules.Add(rule6);
+            program.rules.Add(rule7);
+
             Console.WriteLine(program);
             YFmodeler test1 = new YFmodeler(program);
             test1.RunModels();

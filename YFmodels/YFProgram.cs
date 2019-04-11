@@ -8,11 +8,13 @@ namespace YFmodels
     {
         public List<Rule> rules;
         public List<Atom> atoms;
+        public int expect;
 
-        public YFProgram()
+        public YFProgram(int expect = -1)
         {
             rules = new List<Rule>();
             atoms = new List<Atom>();
+            this.expect = expect;
         }
 
         public override string ToString()

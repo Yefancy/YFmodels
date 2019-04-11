@@ -32,20 +32,22 @@ namespace YFmodels
             else if (partialModel.Count() == program.atoms.Count)
             {
                 stableModel.Add((Model)partialModel.Clone());
+                program.expect--;
                 return true;
             }
             else
             {
                 Model chosen = heuristic(program, partialModel);
                 Model TM = (Model)partialModel.Clone();
+                Model FM = (Model)partialModel.Clone();
                 TM = TM + chosen;
                 if (DFSModels(program, TM))
-                    return true;
-                else
-                {
-                    Model FM = (Model)partialModel.Clone();
-                    return DFSModels(program, FM + (chosen.Converse()));
-                }
+                    if (program.expect != 0)
+                    {                  
+                        return DFSModels(program, FM + (chosen.Converse()));
+                    }
+                    else return true;
+                return DFSModels(program, FM + (chosen.Converse()));
             }
         }
 
@@ -119,11 +121,12 @@ namespace YFmodels
         {
             List<Atom> F = new List<Atom>();
             Queue<Atom> queue = new Queue<Atom>();
-            foreach (var atom in program.atoms)
-                queue.Enqueue(atom);
+            foreach (var r in program.rules)
+                queue.Enqueue(r.head);
             while (queue.Count != 0)
             {
                 Atom atom = queue.Dequeue();
+                atom.inUpper = atom.falseFlag ? false : true;
                 if (atom.inUpper)
                 {
                     for (int i = 0; i < atom.pList.Count; i++)
