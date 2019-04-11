@@ -14,67 +14,113 @@ namespace ConsoleApp
 
         static void test1()
         {
-            Model testmodel = new Model();
+            YFProgram program = new YFProgram();
+            //Atom
+            Atom kk_b = new Atom(0);
+            Atom foo_a = new Atom(1);
+            Atom foo_b = new Atom(2);
+            Atom git_b = new Atom(3);
+            Atom git_c = new Atom(4);
+            Atom git_d = new Atom(5);
+            Atom git_e = new Atom(6);
+
+            program.atoms.Add(kk_b);
+            program.atoms.Add(foo_a);
+            program.atoms.Add(foo_b);
+            program.atoms.Add(git_b);
+            program.atoms.Add(git_c);
+            program.atoms.Add(git_d);
+            program.atoms.Add(git_e);
 
             //fact
-            Atom kk_b = new Atom("kk");
-            kk_b.literals.Add(new Literal(L_Type.Const, "b"));
-            Atom foo_a = new Atom("foo");
-            foo_a.literals.Add(new Literal(L_Type.Const, "a"));
+            Rule fact1 = new Rule();
+            Rule fact2 = new Rule();
+            fact1.head = kk_b;
+            kk_b.hList.Add(fact1);
+            fact2.head = foo_a;
+            foo_a.hList.Add(fact2);
 
-            testmodel.AddFact(foo_a);
-            testmodel.AddFact(kk_b);
+            //rule
+            Rule rule1 = new Rule();           
+            rule1.head = foo_b;
+            foo_b.hList.Add(rule1);
+            rule1.pBody.Add(foo_a);
+            foo_a.pList.Add(rule1);
+
+            Rule rule2 = new Rule();
+            rule2.head = git_b;
+            git_b.hList.Add(rule2);
+            rule2.pBody.Add(foo_b);
+            foo_b.pList.Add(rule2);
+
+            Rule rule3 = new Rule();
+            rule3.head = git_c;
+            git_c.hList.Add(rule3);
+            rule3.pBody.Add(kk_b);
+            kk_b.pList.Add(rule3);
+            rule3.pBody.Add(git_b);
+            git_b.pList.Add(rule3);
+
+            Rule rule4 = new Rule();
+            rule4.head = git_e;
+            git_e.hList.Add(rule4);
+            rule4.pBody.Add(git_d);
+            git_d.pList.Add(rule4);
+
+            Rule rule5 = new Rule();
+            rule5.head = git_c;
+            git_c.hList.Add(rule5);
+            rule5.pBody.Add(git_d);
+            git_d.pList.Add(rule5);
+
+            program.rules.Add(fact1);
+            program.rules.Add(fact2);
+            program.rules.Add(rule1);
+            program.rules.Add(rule2);
+            program.rules.Add(rule3);
+            program.rules.Add(rule4);
+            program.rules.Add(rule5);
+
+            Console.WriteLine(program);
+            YFmodeler test1 = new YFmodeler(program);
+            test1.RunModels();
+            var result = test1.stableModel;
+           
+        }
+
+        static void test2()
+        {
+            YFProgram program = new YFProgram();
+            //Atom
+            Atom a = new Atom(0);
+            Atom b = new Atom(1);
+
+            program.atoms.Add(a);
+            program.atoms.Add(b);
+
+            //fact
 
             //rule
             Rule rule1 = new Rule();
-            Atom head1 = new Atom("foo");
-            head1.literals.Add(new Literal(L_Type.Const, "b"));
-            Atom body1 = new Atom("foo");
-            body1.literals.Add(new Literal(L_Type.Const, "a"));
-            rule1.AddBody(body1);
-            rule1.AddHead(head1);
+            rule1.head = a;
+            a.hList.Add(rule1);
+            rule1.nBody.Add(b);
+            b.nList.Add(rule1);
 
             Rule rule2 = new Rule();
-            Atom head2 = new Atom("git");
-            head2.literals.Add(new Literal(L_Type.Const, "b"));
-            Atom body2 = new Atom("foo");
-            body2.literals.Add(new Literal(L_Type.Const, "b"));
-            rule2.AddBody(body2);
-            rule2.AddHead(head2);
+            rule2.head = b;
+            b.hList.Add(rule2);
+            rule2.nBody.Add(a);
+            a.nList.Add(rule2);
 
-            Rule rule3 = new Rule();
-            Atom head3 = new Atom("git");
-            head3.literals.Add(new Literal(L_Type.Const, "c"));
-            Atom body3 = new Atom("git");
-            body3.literals.Add(new Literal(L_Type.Const, "b"));
-            Atom body33 = new Atom("kk");
-            body33.literals.Add(new Literal(L_Type.Const, "b"));
-            rule3.AddBody(body3);
-            rule3.AddBody(body33);
-            rule3.AddHead(head3);
+            program.rules.Add(rule1);
+            program.rules.Add(rule2);
 
-            Rule rule4 = new Rule();
-            Atom head4 = new Atom("git");
-            head4.literals.Add(new Literal(L_Type.Const, "c"));
-            Atom head44 = new Atom("git");
-            head44.literals.Add(new Literal(L_Type.Const, "e"));
-            Atom body4 = new Atom("git");
-            body4.literals.Add(new Literal(L_Type.Const, "d"));
-            rule4.AddHead(head44);
-            rule4.AddBody(body4);
-            rule4.AddHead(head4);
+            Console.WriteLine(program);
+            YFmodeler test2 = new YFmodeler(program);
+            test2.RunModels();
+            var result = test2.stableModel;
 
-            testmodel.AddRule(rule1);
-            testmodel.AddRule(rule2);
-            testmodel.AddRule(rule3);
-            testmodel.AddRule(rule4);
-
-            Console.WriteLine(testmodel);
-
-            YFmodeler YFM = new YFmodeler(testmodel);
-            YFM.run(1);
-            Console.WriteLine(YFM.PrintModel());
-            Console.WriteLine();
         }
     }
 }

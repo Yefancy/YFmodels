@@ -4,31 +4,32 @@ using System.Text;
 
 namespace YFmodels
 {
-    public struct Atom
+    public class Atom: ICloneable
     {
-        public int atom;
-        public int headof;
+        public int atom;        
         public bool trueFlag;
-        public bool falseFlag;     
-    }
+        public bool falseFlag;
+        public int headof;
+        public bool inUpper;
 
-    public class AtomUtils
-    {
-        public static List<Rule> PList(List<Rule> rules, Atom atom)
+        public List<Rule> hList;
+        public List<Rule> pList;
+        public List<Rule> nList;
+
+        public Atom(int _atom,bool _trueFlag = false, bool _falseFlag = false, int _headof = -1)
         {
-            List<Rule> result = new List<Rule>();
-            foreach(var rule in rules)
-                foreach(var l in rule.pBody)
-                    if(l.literal == atom.atom) { result.Add(rule); break; }
-            return result;
+            atom = _atom;
+            trueFlag = _trueFlag;
+            falseFlag = _falseFlag;
+            headof = _headof;
+            hList = new List<Rule>();
+            pList = new List<Rule>();
+            nList = new List<Rule>();
         }
-        public static List<Rule> NList(List<Rule> rules, Atom atom)
+
+        public object Clone()
         {
-            List<Rule> result = new List<Rule>();
-            foreach (var rule in rules)
-                foreach (var l in rule.nBody)
-                    if (l.literal == atom.atom) { result.Add(rule); break; }
-            return result;
+            return new Atom(atom, trueFlag, falseFlag, headof);
         }
     }
 }

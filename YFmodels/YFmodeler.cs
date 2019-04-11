@@ -8,70 +8,182 @@ namespace YFmodels
     public class YFmodeler
     {
         private YFProgram program;
+        public List<Model> stableModel;
 
         public YFmodeler(YFProgram p)
         {
+            stableModel = new List<Model>();
             program = p;
         }
 
         public void RunModels()
         {
-
+            Model basicModel = new Model();
+            foreach (var r in program.rules)
+                if (r.nBody.Count == 0 && r.pBody.Count == 0)
+                    basicModel.trueList.Add(r.head.atom);
+            DFSModels(program, basicModel);
         }
 
         private bool DFSModels(YFProgram program, Model partialModel)
         {
             partialModel = Expand(program, partialModel);
             if (partialModel.IsConflict()) return false;
-            else if (partialModel.atoms.Count == program.AtomCount)
+            else if (partialModel.Count() == program.atoms.Count)
             {
-                if (CheckReduct(program, partialModel))
-                    return true;
-                return false;
+                stableModel.Add((Model)partialModel.Clone());
+                return true;
             }
             else
             {
-                int literal = heuristic(program, partialModel);
-                Atom atom = new Atom();
-                atom.atom = literal; atom.falseFlag = false; atom.trueFlag = true;
+                Model chosen = heuristic(program, partialModel);
                 Model TM = (Model)partialModel.Clone();
-                TM.atoms.Add(atom);
-                if (DFSModels(program, TM)) return true;
+                TM = TM + chosen;
+                if (DFSModels(program, TM))
+                    return true;
                 else
                 {
-                    atom.atom = literal; atom.falseFlag = true; atom.trueFlag = false;
                     Model FM = (Model)partialModel.Clone();
-                    FM.atoms.Add(atom);
-                    return DFSModels(program, FM);
+                    return DFSModels(program, FM + (chosen.Converse()));
                 }
             }
         }
 
         private Model Expand(YFProgram program, Model partialModel)
         {
+            Model copy;
             do
             {
-                Model copy = (Model)partialModel.Clone();
+                copy = partialModel;
+                program.reset();
                 partialModel = Atleast(program, partialModel);
-            } while (true);
-            throw new Exception();
+                Console.WriteLine("\ncopy:" + copy);
+                Console.WriteLine("\nexpand:" + partialModel + "\n");
+                var most = Atmost(program, partialModel);
+                List<int> notList = new List<int>();
+                foreach (var a in program.atoms)
+                    if (!most.Contains(a))
+                        if (!partialModel.falseList.Contains(a.atom))
+                            partialModel.falseList.Add(a.atom);
+                Console.WriteLine("\nexpand:" + partialModel + "\n");
+            } while (copy != partialModel);
+            return partialModel;
         }
 
-        private bool Conflict(Model partialModel)
+        private Model Atleast(YFProgram program, Model partialModel)
         {
-
-            return false;
+            Queue<Atom> posq = new Queue<Atom>();
+            Queue<Atom> negq = new Queue<Atom>();
+            foreach (var num in partialModel.trueList)
+                posq.Enqueue(program.atoms[num]);
+            foreach (var num in partialModel.falseList)
+                negq.Enqueue(program.atoms[num]);
+            while (posq.Count != 0 || negq.Count != 0)
+            {
+                if (posq.Count != 0)
+                {
+                    Atom atom = posq.Dequeue();
+                    atom.trueFlag = true;
+                    for (int i = 0; i < atom.pList.Count; i++)
+                        atom.pList[i].fire(posq, negq);
+                    for (int i = 0; i < atom.nList.Count; i++)
+                        atom.nList[i].inactivate(posq, negq);
+                    if (atom.headof == 1 && atom.hList.Count == 1)
+                        atom.hList[0].BCT(posq, negq);
+                }
+                if (negq.Count != 0)
+                {
+                    Atom atom = negq.Dequeue();
+                    atom.falseFlag = true;
+                    for (int i = 0; i < atom.nList.Count; i++)
+                        atom.nList[i].fire(posq, negq);
+                    for (int i = 0; i < atom.pList.Count; i++)
+                        atom.pList[i].inactivate(posq, negq);
+                    if (atom.headof > 0)
+                        for (int i = 0; i < atom.hList.Count; i++)
+                            atom.hList[i].BCF(posq, negq);
+                }
+            }
+            Model back = new Model();
+            foreach (var atom in program.atoms)
+            {
+                if (atom.trueFlag)
+                    back.trueList.Add(atom.atom);
+                if (atom.falseFlag)
+                    back.falseList.Add(atom.atom);
+            }
+            return back;
         }
 
-        private bool CheckReduct(YFProgram program, Model partialModel)
+        private List<Atom> Atmost(YFProgram program, Model partialModel)
         {
-            return true;
+            List<Atom> F = new List<Atom>();
+            Queue<Atom> queue = new Queue<Atom>();
+            foreach (var atom in program.atoms)
+                queue.Enqueue(atom);
+            while (queue.Count != 0)
+            {
+                Atom atom = queue.Dequeue();
+                if (atom.inUpper)
+                {
+                    for (int i = 0; i < atom.pList.Count; i++)
+                        atom.pList[i].propagateFalse(queue);
+                    atom.inUpper = false;
+                    if (!F.Contains(atom))
+                        F.Add(atom);
+                }
+            }
+            for (int i = 0; i < F.Count; i++)
+                for (int j = 0; j < F[i].hList.Count; j++)
+                    if ((F[i].hList)[j].isUpperActive())
+                        queue.Enqueue(F[i]);
+            while (queue.Count != 0)
+            {
+                Atom atom = queue.Dequeue();
+                if (!atom.inUpper && !atom.falseFlag)
+                {
+                    for (int i = 0; i < atom.pList.Count; i++)
+                        atom.pList[i].propagateTrue(queue);
+                    atom.inUpper = true;
+                }
+            }
+            return F;
         }
 
-        private int heuristic(YFProgram program, Model partialModel)
+        private Model heuristic(YFProgram program, Model partialModel)
         {
-
-            return -1;
+            Queue<int> leftq = new Queue<int>();
+            foreach (var atom in program.atoms)
+                if (!partialModel.trueList.Contains(atom.atom) && !partialModel.falseList.Contains(atom.atom))
+                    leftq.Enqueue(atom.atom);
+            int min = 0, max = 0;
+            Model x = null;
+            while (leftq.Count != 0)
+            {
+                int a = leftq.Dequeue();
+                Model tmp = (Model)partialModel.Clone();
+                tmp.trueList.Add(a);
+                int p = (Expand(program, tmp) - partialModel).Count();
+                if (p >= min)
+                {
+                    tmp = (Model)partialModel.Clone();
+                    tmp.falseList.Add(a);
+                    int n = (Expand(program, tmp) - partialModel).Count();
+                    var _min = Math.Min(n, p);
+                    var _max = Math.Max(n, p);
+                    if (_min > min || (_min == min && _max > max))
+                    {
+                        min = _min;
+                        max = _max;
+                        x = new Model();
+                        if (p == _max)
+                            x.trueList.Add(a);
+                        else
+                            x.falseList.Add(a);
+                    }
+                }
+            }
+            return x;
         }
     }
 }

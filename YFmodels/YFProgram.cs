@@ -7,13 +7,37 @@ namespace YFmodels
     public class YFProgram
     {
         public List<Rule> rules;
-        public List<Literal> facts;
-        public int AtomCount;
+        public List<Atom> atoms;
 
         public YFProgram()
         {
             rules = new List<Rule>();
-            facts = new List<Literal>();
+            atoms = new List<Atom>();
+        }
+
+        public override string ToString()
+        {
+            string result = "";
+            foreach (var rule in rules)
+                result += rule.ToString()+"\n";
+            return result;
+        }
+
+        public void reset()
+        {
+            for(int i = 0; i < rules.Count; i++)
+            {
+                rules[i].literal = rules[i].nBody.Count + rules[i].pBody.Count;
+                rules[i].inactive = 0;
+                rules[i].upper = 0;
+            }
+            for(int i = 0; i < atoms.Count; i++)
+            {
+                atoms[i].trueFlag = false;
+                atoms[i].falseFlag = false;
+                atoms[i].headof = atoms[i].hList.Count;
+                atoms[i].inUpper = true;
+            }
         }
     }
 }
