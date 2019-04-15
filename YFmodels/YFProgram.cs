@@ -9,11 +9,13 @@ namespace YFmodels
         public List<Rule> rules;
         public List<Atom> atoms;
         public int expect;
+        public Dictionary<int, string> dic;
 
         public YFProgram(int expect = -1)
         {
             rules = new List<Rule>();
             atoms = new List<Atom>();
+            dic = new Dictionary<int, string>();
             this.expect = expect;
         }
 
@@ -32,6 +34,7 @@ namespace YFmodels
                 rules[i].literal = rules[i].nBody.Count + rules[i].pBody.Count;
                 rules[i].inactive = 0;
                 rules[i].upper = 0;
+                rules[i].avtiveLs.Clear();
             }
             for(int i = 0; i < atoms.Count; i++)
             {

@@ -16,18 +16,23 @@ namespace YFmodels
             program = p;
         }
 
-        public void RunModels()
+        public bool RunModels()
         {
             Model basicModel = new Model();
             foreach (var r in program.rules)
                 if (r.nBody.Count == 0 && r.pBody.Count == 0)
                     basicModel.trueList.Add(r.head.atom);
-            DFSModels(program, basicModel);
+            if(!program.dic.ContainsKey(1))
+                basicModel.falseList.Add(1);
+            return DFSModels(program, basicModel);
         }
 
         private bool DFSModels(YFProgram program, Model partialModel)
         {
+
             partialModel = Expand(program, partialModel);
+
+
             if (partialModel.IsConflict()) return false;
             else if (partialModel.Count() == program.atoms.Count)
             {
@@ -43,7 +48,7 @@ namespace YFmodels
                 TM = TM + chosen;
                 if (DFSModels(program, TM))
                     if (program.expect != 0)
-                    {                  
+                    {
                         return DFSModels(program, FM + (chosen.Converse()));
                     }
                     else return true;
@@ -59,15 +64,15 @@ namespace YFmodels
                 copy = partialModel;
                 program.reset();
                 partialModel = Atleast(program, partialModel);
-                Console.WriteLine("\ncopy:" + copy);
-                Console.WriteLine("\nexpand:" + partialModel + "\n");
+                //Console.WriteLine("\ncopy:" + copy);
+                //Console.WriteLine("\nexpand:" + partialModel + "\n");
                 var most = Atmost(program, partialModel);
                 List<int> notList = new List<int>();
                 foreach (var a in program.atoms)
                     if (!most.Contains(a))
                         if (!partialModel.falseList.Contains(a.atom))
                             partialModel.falseList.Add(a.atom);
-                Console.WriteLine("\nexpand:" + partialModel + "\n");
+                //Console.WriteLine("\nexpand:" + partialModel + "\n");
             } while (copy != partialModel);
             return partialModel;
         }
@@ -77,9 +82,9 @@ namespace YFmodels
             Queue<Atom> posq = new Queue<Atom>();
             Queue<Atom> negq = new Queue<Atom>();
             foreach (var num in partialModel.trueList)
-                posq.Enqueue(program.atoms[num]);
+                posq.Enqueue(program.atoms.Find((a) => { return a.atom == num; }));
             foreach (var num in partialModel.falseList)
-                negq.Enqueue(program.atoms[num]);
+                negq.Enqueue(program.atoms.Find((a) => { return a.atom == num; }));
             while (posq.Count != 0 || negq.Count != 0)
             {
                 if (posq.Count != 0)
@@ -87,7 +92,7 @@ namespace YFmodels
                     Atom atom = posq.Dequeue();
                     atom.trueFlag = true;
                     for (int i = 0; i < atom.pList.Count; i++)
-                        atom.pList[i].fire(posq, negq);
+                        atom.pList[i].fire(atom,posq, negq);
                     for (int i = 0; i < atom.nList.Count; i++)
                         atom.nList[i].inactivate(posq, negq);
                     if (atom.headof == 1 && atom.hList.Count == 1)
@@ -98,7 +103,7 @@ namespace YFmodels
                     Atom atom = negq.Dequeue();
                     atom.falseFlag = true;
                     for (int i = 0; i < atom.nList.Count; i++)
-                        atom.nList[i].fire(posq, negq);
+                        atom.nList[i].fire(atom,posq, negq);
                     for (int i = 0; i < atom.pList.Count; i++)
                         atom.pList[i].inactivate(posq, negq);
                     if (atom.headof > 0)

@@ -8,6 +8,7 @@ namespace YFmodels
         public Atom head;
         public List<Atom> pBody;
         public List<Atom> nBody;
+        public List<int> avtiveLs;
         public int literal;
         public int inactive;
         public int upper;
@@ -17,6 +18,7 @@ namespace YFmodels
         {
             pBody = new List<Atom>();
             nBody = new List<Atom>();
+            avtiveLs = new List<int>();
         }
 
         public override string ToString()
@@ -31,8 +33,10 @@ namespace YFmodels
             return result;
         }
 
-        public void fire(Queue<Atom> posq, Queue<Atom> negq)
+        public void fire(Atom a,Queue<Atom> posq, Queue<Atom> negq)
         {
+            if (avtiveLs.Contains(a.atom)) return;
+            avtiveLs.Add(a.atom);
             literal--;
             if (literal == 0)
                 posq.Enqueue(head);

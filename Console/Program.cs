@@ -8,8 +8,45 @@ namespace ConsoleApp
         static void Main(string[] args)
         {
             Console.WriteLine("YFmodels");
-            test1();
-            Console.ReadLine();
+            while (true) { test3(); }
+            
+        }
+
+        static void test3()
+        {
+            string lparse = "";
+            while (true)
+            {
+                var tmp = Console.ReadLine();
+                if (tmp.Length == 0)
+                    continue;
+                if (tmp[0] == '#')
+                    break;
+                lparse += tmp+"\n";
+            }
+            var program = LparseUtils.GetProgram(lparse);
+
+            Console.WriteLine(program);
+            YFmodeler test3 = new YFmodeler(program);
+            test3.RunModels();
+            var result = test3.stableModel;
+
+            if (result.Count == 0)
+            {
+                Console.WriteLine("Failed\n===================\n");
+                return;
+            }
+            for (int r = 0; r < result.Count; r++)
+            {
+                Console.WriteLine("StableModel " + (r+1) + ":");
+                foreach (int atom in result[r].trueList)
+                {
+                    if (program.dic.ContainsKey(atom))
+                        Console.Write(program.dic[atom] + ". ");
+                }                 
+                Console.WriteLine();
+            }
+            Console.WriteLine("Finished\n===================\n");
         }
 
         static void test1()
@@ -109,7 +146,14 @@ namespace ConsoleApp
             YFmodeler test1 = new YFmodeler(program);
             test1.RunModels();
             var result = test1.stableModel;
-           
+
+            for (int r = 0; r < result.Count; r++)
+            {
+                Console.WriteLine("StableModel" + r + ":");
+                foreach (int atom in result[r].trueList)
+                    Console.Write(atom + ". ");
+                Console.WriteLine();
+            }
         }
 
         static void test2()
@@ -144,7 +188,14 @@ namespace ConsoleApp
             YFmodeler test2 = new YFmodeler(program);
             test2.RunModels();
             var result = test2.stableModel;
-
+            
+            for(int r = 0;r< result.Count;r++)
+            {
+                Console.WriteLine("StableModel"+r+":");
+                foreach (int atom in result[r].trueList)
+                    Console.Write(atom + ". ");
+                Console.WriteLine();
+            }
         }
     }
 }
